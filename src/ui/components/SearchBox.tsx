@@ -1,10 +1,10 @@
-import React from "react";
-import {Form} from "react-bootstrap";
+import React, {KeyboardEvent, FormEvent} from "react";
 import { debounce } from "lodash";
+import {Form} from "react-bootstrap";
 
 
 export interface SearchBoxProps {
-	query: any;
+	query: (query: string) => void;
 }
 
 export const SearchBox = (props: SearchBoxProps) => {
@@ -13,14 +13,22 @@ export const SearchBox = (props: SearchBoxProps) => {
 		props.query(query);
 	}, 700);
 
-	const onInputChange = (e: any) => {
+	const onInputChange = (e: FormEvent<EventTarget>) => {
 		e.preventDefault();
-		debouncedGet(e.target.value)
+		const target = e.target as HTMLInputElement;
+		debouncedGet(target.value)
+	}
+
+	const onKeyEnter = (e: KeyboardEvent<EventTarget>) => {
+		if (e.key === 'Enter') {
+			const target = e.target as HTMLInputElement;
+			props.query(target.value);
+		}
 	}
 
 	return (
 		<Form.Group className="mb-3" controlId="formBasicSearch">
-			<Form.Control onChange={ onInputChange } type="text" placeholder="Type to search" />
+			<Form.Control onChange={ onInputChange } onKeyDown={ onKeyEnter } type="text" placeholder="Type to search" />
 		</Form.Group>
 	)
 }
